@@ -10,13 +10,15 @@ class Textboxes extends StatefulWidget {
   final int? maxlines;
   final String hintText;
   final TextEditingController controller;
+  final FocusNode focusNode;
 
   const Textboxes({
     super.key, 
     required this.maxlength, 
     this.maxlines, 
     required this.hintText, 
-    required this.controller});
+    required this.controller,
+    required this.focusNode});
 
   @override
   State<Textboxes> createState() => _TextboxesState();
@@ -25,11 +27,13 @@ class Textboxes extends StatefulWidget {
 class _TextboxesState extends State<Textboxes> {
 
 // this allows you to go to the next input when you hit tab
-final _focusnode = FocusNode();
+final _focusnode1 = FocusNode();
+final _focusnode2 = FocusNode();
 
 @override
   void dispose() {
-    _focusnode.dispose();
+    _focusnode1.dispose();
+    _focusnode2.dispose();
     // TODO: implement dispose
     super.dispose();
   }
@@ -37,7 +41,7 @@ final _focusnode = FocusNode();
   @override
   Widget build(BuildContext context) {
     return TextField(
-      focusNode: _focusnode,
+      focusNode: widget.focusNode,
       onEditingComplete: () => FocusScope.of(context).nextFocus(),
       controller: widget.controller,
       maxLength: widget.maxlength,

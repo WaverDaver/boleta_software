@@ -12,13 +12,52 @@ class HomeScreen extends StatefulWidget {
 
 
 String person_selected = '';
+bool entrar_pressed = false;
+int entrar_pressed_count = 0;
+Color blue = Colors.blue;
+
+void person_selected_know(){
+  print(person_selected);
+}
+
 
 
 
 
 class _HomeScreenState extends State<HomeScreen> {
 
-final TextEditingController titleController = TextEditingController();
+//controllers are used to keep track of what the user is typing
+final TextEditingController codigo_controller = TextEditingController();
+final TextEditingController cantidad_controller = TextEditingController();
+
+final _focusnode1 = FocusNode();
+final _focusnode2 = FocusNode();
+final _focusnodeButton = FocusNode();
+
+void dispose() {
+    _focusnode1.dispose();
+    _focusnode2.dispose();
+    _focusnodeButton.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+ void handling_entrar(){
+  if (entrar_pressed_count >= 1){
+    setState(() {
+        entrar_pressed_count = 0;
+    });
+    FocusScope.of(context).requestFocus(_focusnode1);
+  }
+ }
+
+List <DataRow> table_rows = [DataRow(cells: [
+  DataCell(Text('')),
+  DataCell(Text('')),
+  DataCell(Text('')),
+  DataCell(Text('')),
+])];
+
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +75,8 @@ final TextEditingController titleController = TextEditingController();
                 children: [
                   _mainbutton(person_selected_know, 'Productos'),
                   Spacer(),
+
+                  //menu to pick which worker
                       DropdownMenu(
                         textStyle: TextStyle(
                           color: Colors.white
@@ -55,30 +96,150 @@ final TextEditingController titleController = TextEditingController();
                 ],
               ),
             ),
-            Row(
-              children: [
-                Expanded(child: Textboxes(
-                  maxlength: 5, 
-                  hintText: 'Cantidad', 
-                  controller: titleController)),
-                  SizedBox(width: 5,),
-                Expanded(
-                  child: Textboxes(
+            SizedBox(height: 10),
+
+            //cantidad and codigo text fields
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Row(
+                children: [
+                  Expanded(child: Textboxes(
                     maxlength: 5, 
+                    maxlines: 1,
                     hintText: 'Codigo de Producto', 
-                    controller: titleController),
-                ),
+                    controller: codigo_controller,
+                    focusNode: _focusnode1,),
+                
+                
+                     ),
+                    SizedBox(width: 5,),
+                  Expanded(
+                    child: Textboxes(
+                      maxlength: 5, 
+                      maxlines: 1,
+                      hintText: 'Cantidad', 
+                      controller: cantidad_controller,
+                      focusNode: _focusnode2,),
+                      
+                  ),
+                ],
+              ),
+            ),
+
+            //ENTRAR BUTTON
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: blue
+                  ),
+                  focusNode: _focusnodeButton,
+                  onPressed: (){
+                    setState(() {
+                      entrar_pressed = true;
+                      entrar_pressed_count = entrar_pressed_count + 1;
+                    });
+                    handling_entrar();
+                    print("Entrar pressed");
+                    print(entrar_pressed_count);
+                  }, 
+                child: Text("Entrar",
+                style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.normal,
+          color: Colors.white
+        ),
+        ),)
               ],
+            ),
+
+            SizedBox(height: 10),
+
+            Container(
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 195, 192, 192),
+                borderRadius: BorderRadius.circular(16.0)
+              ),
+              child: DataTable(
+
+                //making the table lines only show on the inside
+                border: TableBorder(
+                  top: BorderSide.none,
+                  bottom: BorderSide.none,
+                  right: BorderSide.none,
+                  left: BorderSide.none,
+                  verticalInside: BorderSide(
+                    color: Colors.white
+                  ),
+                  horizontalInside: BorderSide(
+                    color: Colors.white
+                  )
+                ),
+
+
+                columns: [
+                  DataColumn(label: Text("Cantidad", 
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold
+                  ),)),
+                  DataColumn(label: Text("Producto Nombre", style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold
+                  ),)),
+                  DataColumn(label: Text("Precio Unitario", style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold
+                  ),)),
+                  DataColumn(label: Text("Total", style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold
+                  ),))
+                  
+                ], 
+                rows: table_rows,
+                  ),
+            ),
+
+
+                SizedBox(height: 10),
+
+                
+            //listo! button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: blue
+                    ),
+                    onPressed: null, 
+                  child: Text("Listo!", style: TextStyle(
+                    fontSize: 15,
+          fontWeight: FontWeight.normal,
+          color: Colors.white
+
+                  ),)),
+                ],
+              ),
             )
+
+
+
+
+
           ],
         ),
       ),
     );
   }
-
-void person_selected_know(){
-  print(person_selected);
-}
 
 //main functions to create different buttons rapidly and declutter the space above
   //used for all top left buttons 
