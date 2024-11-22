@@ -16,6 +16,15 @@ bool entrar_pressed = false;
 int entrar_pressed_count = 0;
 Color blue = Colors.blue;
 
+//first row text variables (or else the table breaks because it can't have no rows at the start)
+String row1_cantidad = '';
+String row1_producto_nombre = '';
+String row1_precio_unitario = '';
+String row1_total = ''; 
+bool row1_selected = false;
+int row1count = 0;
+
+
 void person_selected_know(){
   print(person_selected);
 }
@@ -51,11 +60,41 @@ void dispose() {
   }
  }
 
+ void adding_table(){
+  setState(() {
+    if (row1count == 1){
+      row1_cantidad = cantidad_controller.text;
+      row1_producto_nombre = 'ROW1';
+      row1_total = "ROW1";
+      row1_precio_unitario = "ROW1";
+      table_rows[0] = DataRow(cells: [
+        DataCell(Text(row1_cantidad, style: _table_text_style(),)),
+        DataCell(Text(row1_producto_nombre, style: _table_text_style(),)),
+        DataCell(Text(row1_precio_unitario, style: _table_text_style(),)),
+        DataCell(Text(row1_total, style: _table_text_style(),)),
+      ]);
+
+    } else if (row1count >= 2){
+
+      table_rows.add(DataRow(cells: [
+      DataCell(Text(cantidad_controller.text, style: _table_text_style(),)),
+      DataCell(Text('hola', style: _table_text_style(),)),
+      DataCell(Text('hola', style: _table_text_style(),)),
+      DataCell(Text('hola',style: _table_text_style(),)),
+
+    ])
+    );
+    }
+
+    
+  });
+ }
+
 List <DataRow> table_rows = [DataRow(cells: [
-  DataCell(Text('')),
-  DataCell(Text('')),
-  DataCell(Text('')),
-  DataCell(Text('')),
+  DataCell(Text(row1_cantidad)),
+  DataCell(Text(row1_producto_nombre)),
+  DataCell(Text(row1_precio_unitario)),
+  DataCell(Text(row1_total)),
 ])];
 
 
@@ -139,10 +178,13 @@ List <DataRow> table_rows = [DataRow(cells: [
                     setState(() {
                       entrar_pressed = true;
                       entrar_pressed_count = entrar_pressed_count + 1;
+                      row1count = row1count + 1;
+                      adding_table();
                     });
                     handling_entrar();
                     print("Entrar pressed");
                     print(entrar_pressed_count);
+                    print("ROW1 Count:" + row1count.toString());
                   }, 
                 child: Text("Entrar",
                 style: TextStyle(
@@ -267,6 +309,12 @@ List <DataRow> table_rows = [DataRow(cells: [
         color: Colors.grey,));
   }
 
+  TextStyle _table_text_style(){
+    return TextStyle(
+      color: Colors.white,
+      fontSize: 14,
+    );
+  }
 
   ButtonStyle _buttonstyle(){
     return OutlinedButton.styleFrom(
