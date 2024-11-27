@@ -2,6 +2,9 @@
 
 import 'package:boleta_software/textboxes.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'dart:convert';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,6 +18,7 @@ String person_selected = '';
 bool entrar_pressed = false;
 int entrar_pressed_count = 0;
 Color blue = Colors.blue;
+Color red = Colors.red;
 
 //first row text variables (or else the table breaks because it can't have no rows at the start)
 String row1_cantidad = '';
@@ -29,7 +33,37 @@ void person_selected_know(){
   print(person_selected);
 }
 
+class FileStorage {
+  late File _file;
 
+  Future<void> initFile () async{
+    //final directory = await getApplicationDocumentsDirectory();
+    _file = File('assets/output.json');
+  }
+
+  Future<void> writeData(Map<String, dynamic> data) async{
+    final jsonString = jsonEncode(data);
+    await _file.writeAsString(jsonString);
+  }
+
+  Future<Map<String, dynamic>> readData() async{
+    final contents = await _file.readAsString();
+    return jsonDecode(contents);
+  }
+
+
+}
+
+void file_test() async{
+  final fileStorage = FileStorage();
+
+  await fileStorage.initFile();
+
+  await fileStorage.writeData({'codigo': '4', 'nombre': 'LARRY', 'precio_unitario': '567'});
+
+  final data = await fileStorage.readData();
+  print(data);
+}
 
 
 
@@ -60,6 +94,17 @@ void dispose() {
   }
  }
 
+ void handling_borrar(){
+  setState(() {
+    row1_cantidad = '';
+    row1_precio_unitario = '';
+    row1_producto_nombre = '';
+    row1_total = '';
+    table_rows.clear();
+  });
+  
+ }
+
  void adding_table(){
   setState(() {
     if (row1count == 1){
@@ -86,7 +131,6 @@ void dispose() {
     );
     }
 
-    
   });
  }
 
@@ -165,10 +209,11 @@ List <DataRow> table_rows = [DataRow(cells: [
               ),
             ),
 
-            //ENTRAR BUTTON
+            // ENTRAR BUTTON
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     backgroundColor: blue
@@ -180,6 +225,8 @@ List <DataRow> table_rows = [DataRow(cells: [
                       entrar_pressed_count = entrar_pressed_count + 1;
                       row1count = row1count + 1;
                       adding_table();
+                      cantidad_controller.clear();
+                      codigo_controller.clear();
                     });
                     handling_entrar();
                     print("Entrar pressed");
@@ -252,31 +299,37 @@ List <DataRow> table_rows = [DataRow(cells: [
                 SizedBox(height: 10),
 
                 
-            //listo! button
+            //listo! and BORRAR button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       backgroundColor: blue
                     ),
-                    onPressed: null, 
+                    onPressed: file_test, 
                   child: Text("Listo!", style: TextStyle(
                     fontSize: 15,
           fontWeight: FontWeight.normal,
           color: Colors.white
 
                   ),)),
+
+                  OutlinedButton(style: OutlinedButton.styleFrom(
+                    backgroundColor: red
+                  ), 
+                  onPressed: handling_borrar, 
+                  child: Text("Borrar",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.white))),
                 ],
               ),
             )
-
-
-
-
-
           ],
         ),
       ),
