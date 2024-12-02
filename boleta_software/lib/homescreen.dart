@@ -31,8 +31,13 @@ bool row1_selected = false;
 int row1count = 0;
 
 
+//variable storing the file path of the database
+String file_path_string = "";
+
+
 void person_selected_know(){
   print(person_selected);
+  print(Directory.current);
 }
 
 
@@ -73,6 +78,8 @@ void json_file_path_creator() async{
   if (!await file.exists()){
     await file.create();
     print('File created at path $file_path');
+  } else{
+    print("already exists");
   }
 
   final file_path_data = {
@@ -84,7 +91,8 @@ void json_file_path_creator() async{
 
   final contents_of_written_file = await file.readAsString();
   final jsonData = jsonDecode(contents_of_written_file);
-  print(jsonData);
+  print(jsonData.values.first);
+  file_path_string = jsonData.values.first;
 
 }
 
@@ -147,6 +155,9 @@ List <DataRow> table_rows = [DataRow(cells: [
 
   @override
   Widget build(BuildContext context) {
+
+
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Color.fromARGB(255, 42, 44, 53),
