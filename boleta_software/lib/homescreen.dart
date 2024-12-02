@@ -4,6 +4,7 @@ import 'package:boleta_software/textboxes.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:convert';
+import 'package:path/path.dart' as path_utils;
 
 
 class HomeScreen extends StatefulWidget {
@@ -20,6 +21,7 @@ int entrar_pressed_count = 0;
 Color blue = Colors.blue;
 Color red = Colors.red;
 
+
 //first row text variables (or else the table breaks because it can't have no rows at the start)
 String row1_cantidad = '';
 String row1_producto_nombre = '';
@@ -33,37 +35,8 @@ void person_selected_know(){
   print(person_selected);
 }
 
-class FileStorage {
-  late File _file;
-
-  Future<void> initFile () async{
-    //final directory = await getApplicationDocumentsDirectory();
-    _file = File('assets/output.json');
-  }
-
-  Future<void> writeData(Map<String, dynamic> data) async{
-    final jsonString = jsonEncode(data);
-    await _file.writeAsString(jsonString);
-  }
-
-  Future<Map<String, dynamic>> readData() async{
-    final contents = await _file.readAsString();
-    return jsonDecode(contents);
-  }
 
 
-}
-
-void file_test() async{
-  final fileStorage = FileStorage();
-
-  await fileStorage.initFile();
-
-  await fileStorage.writeData({'codigo': '4', 'nombre': 'LARRY', 'precio_unitario': '567'});
-
-  final data = await fileStorage.readData();
-  print(data);
-}
 
 
 
@@ -72,18 +45,48 @@ class _HomeScreenState extends State<HomeScreen> {
 //controllers are used to keep track of what the user is typing
 final TextEditingController codigo_controller = TextEditingController();
 final TextEditingController cantidad_controller = TextEditingController();
+final TextEditingController file_path_controller = TextEditingController();
 
 final _focusnode1 = FocusNode();
 final _focusnode2 = FocusNode();
 final _focusnodeButton = FocusNode();
+final _focusnodefilepath = FocusNode();
 
 void dispose() {
     _focusnode1.dispose();
     _focusnode2.dispose();
     _focusnodeButton.dispose();
+    _focusnodefilepath.dispose();
     // TODO: implement dispose
     super.dispose();
   }
+
+
+void json_file_path_creator() async{
+
+  //file path where the file with the directory of the database will be created
+  final file_path = path_utils.join(Directory.current.path, 'file_path.json');
+  
+  final file = File(file_path);
+
+  //check if the file already exists
+  if (!await file.exists()){
+    await file.create();
+    print('File created at path $file_path');
+  }
+
+  final file_path_data = {
+    'path': file_path_controller.text,
+  };
+
+  await file.writeAsString(jsonEncode(file_path_data));
+  print("data has been written to file");
+
+  final contents_of_written_file = await file.readAsString();
+  final jsonData = jsonDecode(contents_of_written_file);
+  print(jsonData);
+
+}
 
  void handling_entrar(){
   if (entrar_pressed_count >= 1){
@@ -156,7 +159,46 @@ List <DataRow> table_rows = [DataRow(cells: [
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  //productos button
+
                   _mainbutton(person_selected_know, 'Productos'),
+
+                  //file path button
+                  OutlinedButton(onPressed: (){
+                    showDialog(context: context, builder: (context){
+                      return AlertDialog(
+                        title: Text("File Path"),
+                        actions: [
+                          Textboxes(
+                            maxlength: 40, 
+                            hintText: 'File Path Aqui', 
+                            controller: file_path_controller, 
+                            focusNode: _focusnodefilepath,
+                            textStyle: TextStyle(
+                              color: Colors.black
+                            ),),
+                            OutlinedButton(onPressed: (){
+                              //closes pop up window
+                              Navigator.of(context).pop();
+                              json_file_path_creator();
+                               
+                            }, 
+                            child: Text("Cerrar"))
+                        ],
+                      );
+                    });
+                  }, 
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: blue,
+                    shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero)
+                  ),
+                  child: Text("File Path", 
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.white
+                  ),)),
                   Spacer(),
 
                   //menu to pick which worker
@@ -191,7 +233,10 @@ List <DataRow> table_rows = [DataRow(cells: [
                     maxlines: 1,
                     hintText: 'Codigo de Producto', 
                     controller: codigo_controller,
-                    focusNode: _focusnode1,),
+                    focusNode: _focusnode1,
+                    textStyle: TextStyle(
+                      color: Colors.white
+                    ),),
                 
                 
                      ),
@@ -202,7 +247,10 @@ List <DataRow> table_rows = [DataRow(cells: [
                       maxlines: 1,
                       hintText: 'Cantidad', 
                       controller: cantidad_controller,
-                      focusNode: _focusnode2,),
+                      focusNode: _focusnode2,
+                      textStyle: TextStyle(
+                        color: Colors.white
+                      ),),
                       
                   ),
                 ],
@@ -310,7 +358,7 @@ List <DataRow> table_rows = [DataRow(cells: [
                     style: OutlinedButton.styleFrom(
                       backgroundColor: blue
                     ),
-                    onPressed: file_test, 
+                    onPressed: null, 
                   child: Text("Listo!", style: TextStyle(
                     fontSize: 15,
           fontWeight: FontWeight.normal,
@@ -372,7 +420,6 @@ List <DataRow> table_rows = [DataRow(cells: [
   ButtonStyle _buttonstyle(){
     return OutlinedButton.styleFrom(
       backgroundColor: Colors.blue,
-      foregroundColor: Colors.red,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.zero
       )

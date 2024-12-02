@@ -11,6 +11,7 @@ class Textboxes extends StatefulWidget {
   final String hintText;
   final TextEditingController controller;
   final FocusNode focusNode;
+  final TextStyle textStyle;
 
   const Textboxes({
     super.key, 
@@ -18,7 +19,8 @@ class Textboxes extends StatefulWidget {
     this.maxlines, 
     required this.hintText, 
     required this.controller,
-    required this.focusNode});
+    required this.focusNode,
+    required this.textStyle,});
 
   @override
   State<Textboxes> createState() => _TextboxesState();
@@ -46,6 +48,7 @@ final _focusnode2 = FocusNode();
       controller: widget.controller,
       maxLength: widget.maxlength,
       maxLines: widget.maxlines,
+      style: widget.textStyle,
       cursorColor: Colors.white,
       decoration: InputDecoration(
         hintText: widget.hintText,
@@ -69,9 +72,6 @@ final _focusnode2 = FocusNode();
 
         )
       ),
-      style: TextStyle(
-        color: Colors.white
-      )
 
     );
   }
