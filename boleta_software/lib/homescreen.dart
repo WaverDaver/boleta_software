@@ -2,6 +2,7 @@
 
 import 'package:boleta_software/textboxes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:path/path.dart' as path_utils;
@@ -24,6 +25,7 @@ Color red = Colors.red;
 
 //first row text variables (or else the table breaks because it can't have no rows at the start)
 String row1_cantidad = '';
+String producto_numero = '';
 String row1_producto_nombre = '';
 String row1_precio_unitario = '';
 String row1_total = ''; 
@@ -31,8 +33,21 @@ bool row1_selected = false;
 int row1count = 0;
 
 
+
+//variables that are found after the database has been parsed and it found the names of
+//the product that you are looking for and its price
+String database_nombre = '';
+String database_precio_unitario = '';
+int database_precio_unitario_int = 0;
+int total_for_row = 0;
+String total_for_row_as_string = '';
+int overall_price = 0;
+String overall_price_as_string = '';
+
 //variable storing the file path of the database
 String file_path_string = "";
+List database = [];
+bool databasejson_exists = false;
 
 
 void person_selected_know(){
@@ -44,13 +59,12 @@ void person_selected_know(){
 
 
 
-
 class _HomeScreenState extends State<HomeScreen> {
 
 //controllers are used to keep track of what the user is typing
 final TextEditingController codigo_controller = TextEditingController();
 final TextEditingController cantidad_controller = TextEditingController();
-final TextEditingController file_path_controller = TextEditingController();
+TextEditingController file_path_controller = TextEditingController();
 
 final _focusnode1 = FocusNode();
 final _focusnode2 = FocusNode();
@@ -66,35 +80,65 @@ void dispose() {
     super.dispose();
   }
 
+void activating_database() async {
+  //turns the directory file path into a string
+  final straight_file_path = path_utils.join(Directory.current.path, 'database.json');
 
-void json_file_path_creator() async{
+  final straight_file = File(straight_file_path);
 
-  //file path where the file with the directory of the database will be created
-  final file_path = path_utils.join(Directory.current.path, 'file_path.json');
-  
-  final file = File(file_path);
+  //checks if the file exists and displays it in the pop-up window
+  if (await straight_file.exists()){
+    setState(() {
+        databasejson_exists = true;
+    });
+}
 
-  //check if the file already exists
-  if (!await file.exists()){
-    await file.create();
-    print('File created at path $file_path');
-  } else{
-    print("already exists");
+//decodes the json database as a string and then a list
+  final string_json = await straight_file.readAsString();
+  List straightjsondata = jsonDecode(string_json);
+
+  //puts the json database into a list so its usable
+  database = straightjsondata;
+
+  //making the directory show in a textfield so the user can copy and paste it 
+  //in the folders app to see if the database is really there
+  file_path_controller.text = straight_file_path;
+
+  setState(() {
+    file_path_string = straight_file_path;
+  });
+}
+
+//after activating_database is run, this function can be used because the database
+//is saved inside the variable, database
+
+//this function searches inside of the database for the codigo that you are looking for
+//that way through the database, you can find the name and precio of the product
+
+int index_of_found_codigo = 0;
+
+void database_search(String codigo){
+
+  for (int i = 0; i < database.length; i++){
+
+    //parses through the database to search for the right codigo
+    Map <String, dynamic> maps_in_database = database[i];
+    String codigos_in_database = maps_in_database.values.first;
+
+    //once found, it will remember the index number of the location of that certain codigo
+    if (codigos_in_database == codigo){
+      index_of_found_codigo = i;
+      print("NAME: " + database[i]['nombre']);
+      database_nombre = database[i]['nombre'];
+      database_precio_unitario = database[i]['precio_unitario'];
+      database_precio_unitario_int = int.parse(database_precio_unitario);
+    }
   }
 
-  final file_path_data = {
-    'path': file_path_controller.text,
-  };
 
-  await file.writeAsString(jsonEncode(file_path_data));
-  print("data has been written to file");
-
-  final contents_of_written_file = await file.readAsString();
-  final jsonData = jsonDecode(contents_of_written_file);
-  print(jsonData.values.first);
-  file_path_string = jsonData.values.first;
 
 }
+
 
  void handling_entrar(){
   if (entrar_pressed_count >= 1){
@@ -111,18 +155,33 @@ void json_file_path_creator() async{
     row1_precio_unitario = '';
     row1_producto_nombre = '';
     row1_total = '';
+    overall_price = 0;
     table_rows.clear();
   });
   
+ }
+
+
+ void handling_total(){
+  int cantidad_in_int = int.parse(cantidad_controller.text);
+  int total_for_row = cantidad_in_int * database_precio_unitario_int;
+  total_for_row_as_string = total_for_row.toString();
+
+  //adds this rows total to the TOTAL TOTAL 
+  overall_price = overall_price + total_for_row;
+  setState(() {
+    overall_price_as_string = overall_price.toString();
+  });
+
  }
 
  void adding_table(){
   setState(() {
     if (row1count == 1){
       row1_cantidad = cantidad_controller.text;
-      row1_producto_nombre = 'ROW1';
-      row1_total = "ROW1";
-      row1_precio_unitario = "ROW1";
+      row1_producto_nombre = database_nombre;
+      row1_total = total_for_row_as_string;
+      row1_precio_unitario = database_precio_unitario;
       table_rows[0] = DataRow(cells: [
         DataCell(Text(row1_cantidad, style: _table_text_style(),)),
         DataCell(Text(row1_producto_nombre, style: _table_text_style(),)),
@@ -134,9 +193,9 @@ void json_file_path_creator() async{
 
       table_rows.add(DataRow(cells: [
       DataCell(Text(cantidad_controller.text, style: _table_text_style(),)),
-      DataCell(Text('hola', style: _table_text_style(),)),
-      DataCell(Text('hola', style: _table_text_style(),)),
-      DataCell(Text('hola',style: _table_text_style(),)),
+      DataCell(Text(database_nombre, style: _table_text_style(),)),
+      DataCell(Text(database_precio_unitario, style: _table_text_style(),)),
+      DataCell(Text(total_for_row_as_string,style: _table_text_style(),)),
 
     ])
     );
@@ -155,9 +214,7 @@ List <DataRow> table_rows = [DataRow(cells: [
 
   @override
   Widget build(BuildContext context) {
-
-
-
+    
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Color.fromARGB(255, 42, 44, 53),
@@ -181,17 +238,20 @@ List <DataRow> table_rows = [DataRow(cells: [
                         title: Text("File Path"),
                         actions: [
                           Textboxes(
-                            maxlength: 40, 
-                            hintText: 'File Path Aqui', 
+                            maxlength: 100, 
+                            hintText: "Presiona Load", 
                             controller: file_path_controller, 
                             focusNode: _focusnodefilepath,
                             textStyle: TextStyle(
                               color: Colors.black
                             ),),
+                            Text("Database Found: " + databasejson_exists.toString()),
+                            OutlinedButton(onPressed: 
+                            activating_database, child: Text("Load", 
+                             )),
                             OutlinedButton(onPressed: (){
                               //closes pop up window
                               Navigator.of(context).pop();
-                              json_file_path_creator();
                                
                             }, 
                             child: Text("Cerrar"))
@@ -279,6 +339,9 @@ List <DataRow> table_rows = [DataRow(cells: [
                   ),
                   focusNode: _focusnodeButton,
                   onPressed: (){
+                    database_search(codigo_controller.text);
+                    producto_numero = codigo_controller.text;
+                    handling_total();
                     setState(() {
                       entrar_pressed = true;
                       entrar_pressed_count = entrar_pressed_count + 1;
@@ -288,9 +351,6 @@ List <DataRow> table_rows = [DataRow(cells: [
                       codigo_controller.clear();
                     });
                     handling_entrar();
-                    print("Entrar pressed");
-                    print(entrar_pressed_count);
-                    print("ROW1 Count:" + row1count.toString());
                   }, 
                 child: Text("Entrar",
                 style: TextStyle(
