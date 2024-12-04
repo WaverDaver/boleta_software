@@ -156,6 +156,7 @@ void database_search(String codigo){
     row1_producto_nombre = '';
     row1_total = '';
     overall_price = 0;
+    overall_price_as_string = '0';
     table_rows.clear();
   });
   
@@ -417,7 +418,35 @@ List <DataRow> table_rows = [DataRow(cells: [
 
                 SizedBox(height: 10),
 
-                
+                //TOTAL PRICE BELOW THE TABLE
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  width: 300,
+                  height: 75,
+                  color: Colors.blueAccent,
+                  child: Center(
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Total: ",
+                        style: TextStyle(fontSize: 35, fontStyle: FontStyle.italic),
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: overall_price_as_string,
+                            style: TextStyle(fontSize: 35, fontStyle: FontStyle.normal)
+                          )
+                        ]
+                      ),
+          
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+
+            SizedBox(height: 10),
+
             //listo! and BORRAR button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5.0),
