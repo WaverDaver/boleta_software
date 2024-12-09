@@ -1,8 +1,13 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:typed_data';
+
 import 'package:boleta_software/textboxes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
+import 'package:pdf/widgets.dart' as pw;
 import 'dart:io';
 import 'dart:convert';
 import 'package:path/path.dart' as path_utils;
@@ -55,7 +60,27 @@ void person_selected_know(){
   print(Directory.current);
 }
 
+//printing function
 
+Future<Uint8List> generatedPdf() async{
+  final pdf = pw.Document();
+
+  pdf.addPage(
+    pw.Page(build: (context) => pw.Center(
+      child: pw.Text(
+        "HOLA",
+        style: pw.TextStyle(fontSize: 20),
+      )
+    ))
+  );
+  return pdf.save();
+}
+
+void pdf_print() async {
+  final pdfbytes = await generatedPdf();
+
+  await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdfbytes);
+}
 
 
 
@@ -79,6 +104,8 @@ void dispose() {
     // TODO: implement dispose
     super.dispose();
   }
+
+
 
 void activating_database() async {
   //turns the directory file path into a string
@@ -107,6 +134,7 @@ void activating_database() async {
   setState(() {
     file_path_string = straight_file_path;
   });
+  print("hola");
 }
 
 //after activating_database is run, this function can be used because the database
@@ -212,10 +240,17 @@ List <DataRow> table_rows = [DataRow(cells: [
   DataCell(Text(row1_total)),
 ])];
 
+int database_loading = 0;
 
   @override
   Widget build(BuildContext context) {
-    
+
+//loads the database once when the app is opened
+    if (database_loading == 0){
+      activating_database();
+      database_loading = 1;
+    }
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Color.fromARGB(255, 42, 44, 53),
@@ -477,7 +512,11 @@ List <DataRow> table_rows = [DataRow(cells: [
                   color: Colors.white))),
                 ],
               ),
-            )
+            ),
+            OutlinedButton(
+              onPressed: pdf_print,
+              child: Text("Print")
+              ),
           ],
         ),
       ),
