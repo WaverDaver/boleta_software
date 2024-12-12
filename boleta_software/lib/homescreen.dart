@@ -51,7 +51,7 @@ String overall_price_as_string = '';
 
 
 //this list will later be used to display all the products and prices on the printed receipt
-List boleta_list = ["Producto          Cantidad          Precio Unitario          Total"];
+List<List<String>> boleta_list = [];
 
 //variable storing the file path of the database
 String file_path_string = "";
@@ -65,26 +65,53 @@ void person_selected_know(){
 }
 
 //printing functionality
-String receipt_as_string = '';
 int receipt_amount = boleta_list.length;
 int receipt_printing_count = 0;
 var pdf = pw.Document();
 
 Future<Uint8List> generatedPdf() async{
 
-  for (var item in boleta_list){
-    receipt_as_string += item + "\n";
-  }
+// "Producto   Cantidad   Precio Unitario   Total"
   var pdf = pw.Document();
   pdf.addPage(
     pw.Page(build: (context) => pw.Align(
       alignment: pw.Alignment.topLeft,
-      child: pw.Text(
-        receipt_as_string,
-        style: pw.TextStyle(fontSize: 12),
-      )
-    ))
-  );
+      child: pw.Table(
+        border: pw.TableBorder(
+          horizontalInside: pw.BorderSide.none,
+          verticalInside: pw.BorderSide.none),
+        children: [
+          //the head columns for the printed receipt table
+          pw.TableRow(children: [
+            pw.Text('Cantidad', textAlign: pw.TextAlign.left),
+            pw.Text('Descripcion', textAlign: pw.TextAlign.left),
+            pw.Text('Precio Unitario', textAlign: pw.TextAlign.left),
+            pw.Text('Valor', textAlign: pw.TextAlign.left),
+          ]),
+          
+          //dividers
+          pw.TableRow(children: [
+            pw.Expanded(child: pw.Text("-----------------", textAlign: pw.TextAlign.left)),
+            pw.Expanded(child: pw.Text("-----------------", textAlign: pw.TextAlign.left)),
+            pw.Expanded(child: pw.Text("-----------------", textAlign: pw.TextAlign.left)),
+            pw.Expanded(child: pw.Text("-----------------", textAlign: pw.TextAlign.left)),
+          ]),
+
+          //the three dots means spread, which allows dart to unpack each element
+          //in the list of the list, so that it can add them individually
+          ...boleta_list.map((item){
+            return pw.TableRow(children: [
+              pw.Text(item[1], textAlign: pw.TextAlign.left),
+              pw.Text(item[0], textAlign: pw.TextAlign.left),
+              pw.Text(item[2], textAlign: pw.TextAlign.left),
+              pw.Text(item[3], textAlign: pw.TextAlign.left),
+            ],
+            );
+          
+          }).toList()
+        ],
+      ))
+    ));
   return pdf.save();
 }
 
@@ -212,8 +239,9 @@ void database_search(String codigo){
   int total_for_row = cantidad_in_int * database_precio_unitario_int;
   total_for_row_as_string = total_for_row.toString();
 
-  boleta_list.add(database_nombre + "          " + cantidad_controller.text + "          " + database_precio_unitario + "          " + total_for_row_as_string);
 
+//each row is saved to this boleta_list list, so that later they can be used to print out a receipt
+  boleta_list.add([database_nombre, cantidad_controller.text,database_precio_unitario, total_for_row_as_string]);
   //adds this rows total to the TOTAL TOTAL 
   overall_price = overall_price + total_for_row;
   setState(() {
