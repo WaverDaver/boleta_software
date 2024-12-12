@@ -26,6 +26,7 @@ bool entrar_pressed = false;
 int entrar_pressed_count = 0;
 Color blue = Colors.blue;
 Color red = Colors.red;
+Color buttons_color = Color.fromRGBO(79, 156, 249, 1);
 
 
 //first row text variables (or else the table breaks because it can't have no rows at the start)
@@ -312,7 +313,7 @@ int database_loading = 0;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Color.fromARGB(255, 42, 44, 53),
+      backgroundColor: Color.fromRGBO(4, 56, 115, 1),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 0.0),
         child: Column(
@@ -355,7 +356,7 @@ int database_loading = 0;
                     });
                   }, 
                   style: OutlinedButton.styleFrom(
-                    backgroundColor: blue,
+                    backgroundColor: buttons_color,
                     shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.zero)
                   ),
@@ -430,7 +431,10 @@ int database_loading = 0;
 
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    backgroundColor: blue
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6)
+                    ),
+                    backgroundColor: buttons_color
                   ),
                   focusNode: _focusnodeButton,
                   onPressed: (){
@@ -461,7 +465,7 @@ int database_loading = 0;
 
             Container(
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(0, 166, 251,1),
+                color: buttons_color,
                 borderRadius: BorderRadius.circular(16.0)
               ),
               child: DataTable(
@@ -551,7 +555,10 @@ int database_loading = 0;
                   
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      backgroundColor: Color.fromRGBO(0, 166, 251, 1)
+                      backgroundColor: buttons_color,
+                      shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6)
+                    ),
                     ),
                     onPressed: pdf_print, 
                   child: Text("Listo!", style: TextStyle(
@@ -562,6 +569,9 @@ int database_loading = 0;
                   ),)),
 
                   OutlinedButton(style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6)
+                    ),
                     backgroundColor: Color.fromRGBO(219, 58, 52, 1)
                   ), 
                   onPressed: handling_borrar, 
@@ -615,7 +625,7 @@ int database_loading = 0;
 
   ButtonStyle _buttonstyle(){
     return OutlinedButton.styleFrom(
-      backgroundColor: Colors.blue,
+      backgroundColor: buttons_color,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.zero
       )
