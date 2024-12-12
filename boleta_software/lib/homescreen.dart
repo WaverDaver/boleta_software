@@ -81,6 +81,19 @@ Future<Uint8List> generatedPdf() async{
           horizontalInside: pw.BorderSide.none,
           verticalInside: pw.BorderSide.none),
         children: [
+          pw.TableRow(children: [
+            pw.Text('', textAlign: pw.TextAlign.left),
+            pw.Text('', textAlign: pw.TextAlign.left),
+            pw.Text('', textAlign: pw.TextAlign.left),
+            pw.Text('Vendedor: ' + person_selected, textAlign: pw.TextAlign.left),
+          ]),
+
+          //making some space between the "Vendedor: " and the actual receipt table
+          pw.TableRow(children: [
+            pw.SizedBox(height:20),
+          ]),
+
+
           //the head columns for the printed receipt table
           pw.TableRow(children: [
             pw.Text('Cantidad', textAlign: pw.TextAlign.left),
@@ -448,7 +461,7 @@ int database_loading = 0;
 
             Container(
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 195, 192, 192),
+                color: const Color.fromRGBO(0, 166, 251,1),
                 borderRadius: BorderRadius.circular(16.0)
               ),
               child: DataTable(
@@ -460,10 +473,10 @@ int database_loading = 0;
                   right: BorderSide.none,
                   left: BorderSide.none,
                   verticalInside: BorderSide(
-                    color: Colors.white
+                    color: Color.fromRGBO(0, 166, 251,1)
                   ),
                   horizontalInside: BorderSide(
-                    color: Colors.white
+                    color: Color.fromRGBO(0, 166, 251, 1)
                   )
                 ),
 
@@ -504,6 +517,7 @@ int database_loading = 0;
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Container(
+                  
                   width: 300,
                   height: 75,
                   color: Colors.blueAccent,
@@ -537,7 +551,7 @@ int database_loading = 0;
                   
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      backgroundColor: blue
+                      backgroundColor: Color.fromRGBO(0, 166, 251, 1)
                     ),
                     onPressed: pdf_print, 
                   child: Text("Listo!", style: TextStyle(
@@ -548,7 +562,7 @@ int database_loading = 0;
                   ),)),
 
                   OutlinedButton(style: OutlinedButton.styleFrom(
-                    backgroundColor: red
+                    backgroundColor: Color.fromRGBO(219, 58, 52, 1)
                   ), 
                   onPressed: handling_borrar, 
                   child: Text("Borrar",
@@ -595,6 +609,7 @@ int database_loading = 0;
     return TextStyle(
       color: Colors.white,
       fontSize: 14,
+      fontWeight: FontWeight.normal
     );
   }
 
