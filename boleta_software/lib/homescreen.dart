@@ -242,7 +242,7 @@ void database_search(String codigo){
   });
 
 //removing everything in the printing list other than the titles
-  boleta_list.removeRange(1, boleta_list.length);
+  boleta_list.removeRange(0, boleta_list.length);
   pdf = pw.Document();
   
  }
