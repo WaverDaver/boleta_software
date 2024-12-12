@@ -49,6 +49,10 @@ String total_for_row_as_string = '';
 int overall_price = 0;
 String overall_price_as_string = '';
 
+
+//this list will later be used to display all the products and prices on the printed receipt
+List boleta_list = ["Producto          Cantidad          Precio Unitario          Total"];
+
 //variable storing the file path of the database
 String file_path_string = "";
 List database = [];
@@ -60,16 +64,24 @@ void person_selected_know(){
   print(Directory.current);
 }
 
-//printing function
+//printing functionality
+String receipt_as_string = '';
+int receipt_amount = boleta_list.length;
+int receipt_printing_count = 0;
+var pdf = pw.Document();
 
 Future<Uint8List> generatedPdf() async{
-  final pdf = pw.Document();
 
+  for (var item in boleta_list){
+    receipt_as_string += item + "\n";
+  }
+  var pdf = pw.Document();
   pdf.addPage(
-    pw.Page(build: (context) => pw.Center(
+    pw.Page(build: (context) => pw.Align(
+      alignment: pw.Alignment.topLeft,
       child: pw.Text(
-        "HOLA",
-        style: pw.TextStyle(fontSize: 20),
+        receipt_as_string,
+        style: pw.TextStyle(fontSize: 12),
       )
     ))
   );
@@ -187,14 +199,20 @@ void database_search(String codigo){
     overall_price_as_string = '0';
     table_rows.clear();
   });
+
+//removing everything in the printing list other than the titles
+  boleta_list.removeRange(1, boleta_list.length);
+  pdf = pw.Document();
   
  }
 
-
+// "Producto   Cantidad   Precio Unitario   Total"
  void handling_total(){
   int cantidad_in_int = int.parse(cantidad_controller.text);
   int total_for_row = cantidad_in_int * database_precio_unitario_int;
   total_for_row_as_string = total_for_row.toString();
+
+  boleta_list.add(database_nombre + "          " + cantidad_controller.text + "          " + database_precio_unitario + "          " + total_for_row_as_string);
 
   //adds this rows total to the TOTAL TOTAL 
   overall_price = overall_price + total_for_row;
@@ -493,7 +511,7 @@ int database_loading = 0;
                     style: OutlinedButton.styleFrom(
                       backgroundColor: blue
                     ),
-                    onPressed: null, 
+                    onPressed: pdf_print, 
                   child: Text("Listo!", style: TextStyle(
                     fontSize: 15,
           fontWeight: FontWeight.normal,
@@ -513,10 +531,6 @@ int database_loading = 0;
                 ],
               ),
             ),
-            OutlinedButton(
-              onPressed: pdf_print,
-              child: Text("Print")
-              ),
           ],
         ),
       ),
