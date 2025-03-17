@@ -482,9 +482,9 @@ int database_loading = 0;
               children: [
 
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
                       elevation: 5,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6)
@@ -615,8 +615,9 @@ int database_loading = 0;
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 3,
                       backgroundColor: listo_button_color,
                       shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6)
@@ -630,7 +631,8 @@ int database_loading = 0;
 
                   ),)),
 
-                  OutlinedButton(style: OutlinedButton.styleFrom(
+                  ElevatedButton(style: ElevatedButton.styleFrom(
+                    elevation: 3,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6)
                     ),
