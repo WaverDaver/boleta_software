@@ -34,6 +34,7 @@ String row1_cantidad = '';
 String producto_numero = '';
 String row1_producto_nombre = '';
 String row1_precio_unitario = '';
+String row1_por_mayor = "";
 String row1_total = ''; 
 bool row1_selected = false;
 int row1count = 0;
@@ -44,7 +45,9 @@ int row1count = 0;
 //the product that you are looking for and its price
 String database_nombre = '';
 String database_precio_unitario = '';
+String database_por_mayor = '';
 int database_precio_unitario_int = 0;
+int database_por_mayor_int = 0;
 int total_for_row = 0;
 String total_for_row_as_string = '';
 int overall_price = 0;
@@ -100,11 +103,13 @@ Future<Uint8List> generatedPdf() async{
             pw.Text('Cantidad', textAlign: pw.TextAlign.left),
             pw.Text('Descripcion', textAlign: pw.TextAlign.left),
             pw.Text('Precio Unitario', textAlign: pw.TextAlign.left),
+            pw.Text('Por Mayor',textAlign: pw.TextAlign.left),
             pw.Text('Valor', textAlign: pw.TextAlign.left),
           ]),
-          
+
           //dividers
           pw.TableRow(children: [
+            pw.Expanded(child: pw.Text("-----------------", textAlign: pw.TextAlign.left)),
             pw.Expanded(child: pw.Text("-----------------", textAlign: pw.TextAlign.left)),
             pw.Expanded(child: pw.Text("-----------------", textAlign: pw.TextAlign.left)),
             pw.Expanded(child: pw.Text("-----------------", textAlign: pw.TextAlign.left)),
@@ -115,14 +120,28 @@ Future<Uint8List> generatedPdf() async{
           //in the list of the list, so that it can add them individually
           ...boleta_list.map((item){
             return pw.TableRow(children: [
-              pw.Text(item[1], textAlign: pw.TextAlign.left),
-              pw.Text(item[0], textAlign: pw.TextAlign.left),
-              pw.Text(item[2], textAlign: pw.TextAlign.left),
-              pw.Text(item[3], textAlign: pw.TextAlign.left),
+              pw.Text(item[1], textAlign: pw.TextAlign.left), //cantidad
+              pw.Text(item[0], textAlign: pw.TextAlign.left), //descripcion
+              pw.Text(item[2], textAlign: pw.TextAlign.left), //precio unitario
+              pw.Text(item[3], textAlign: pw.TextAlign.left), // precio por mayor
+              pw.Text(item[4], textAlign: pw.TextAlign.left), // total
             ],
             );
           
-          }).toList()
+          }).toList(),
+
+          //making some space between prices/products and the total
+          pw.TableRow(children: [
+            pw.SizedBox(height:20),
+          ]),
+
+          //final row displaying the total
+          pw.TableRow(children: [
+            pw.Text(''),
+            pw.Text(''),
+            pw.Text(''),
+            pw.Text('TOTAL: '+ overall_price_as_string, textAlign: pw.TextAlign.left)
+          ])
         ],
       ))
     ));
@@ -149,6 +168,8 @@ final _focusnode2 = FocusNode();
 final _focusnodeButton = FocusNode();
 final _focusnodefilepath = FocusNode();
 
+
+//makes sure the "attention", what the selected item is, is cleared after an action happens
 void dispose() {
     _focusnode1.dispose();
     _focusnode2.dispose();
@@ -159,7 +180,7 @@ void dispose() {
   }
 
 
-
+//runs the database and loads the data onto the straight_file variable
 void activating_database() async {
   //turns the directory file path into a string
   final straight_file_path = path_utils.join(Directory.current.path, 'database.json');
@@ -187,7 +208,7 @@ void activating_database() async {
   setState(() {
     file_path_string = straight_file_path;
   });
-  print("hola");
+  print("database working");
 }
 
 //after activating_database is run, this function can be used because the database
@@ -212,7 +233,9 @@ void database_search(String codigo){
       print("NAME: " + database[i]['nombre']);
       database_nombre = database[i]['nombre'];
       database_precio_unitario = database[i]['precio_unitario'];
+      database_por_mayor = database[i]['por_mayor'];
       database_precio_unitario_int = int.parse(database_precio_unitario);
+      database_por_mayor_int = int.parse(database_por_mayor);
     }
   }
 
@@ -235,6 +258,7 @@ void database_search(String codigo){
     row1_cantidad = '';
     row1_precio_unitario = '';
     row1_producto_nombre = '';
+    row1_por_mayor = "";
     row1_total = '';
     overall_price = 0;
     overall_price_as_string = '0';
@@ -250,12 +274,16 @@ void database_search(String codigo){
 // "Producto   Cantidad   Precio Unitario   Total"
  void handling_total(){
   int cantidad_in_int = int.parse(cantidad_controller.text);
-  int total_for_row = cantidad_in_int * database_precio_unitario_int;
+  if (cantidad_in_int >= 3){
+     total_for_row = cantidad_in_int * database_por_mayor_int;
+  } else{
+     total_for_row = cantidad_in_int * database_precio_unitario_int;
+  }
   total_for_row_as_string = total_for_row.toString();
 
 
 //each row is saved to this boleta_list list, so that later they can be used to print out a receipt
-  boleta_list.add([database_nombre, cantidad_controller.text,database_precio_unitario, total_for_row_as_string]);
+  boleta_list.add([database_nombre, cantidad_controller.text,database_precio_unitario, database_por_mayor, total_for_row_as_string]);
   //adds this rows total to the TOTAL TOTAL 
   overall_price = overall_price + total_for_row;
   setState(() {
@@ -270,11 +298,13 @@ void database_search(String codigo){
       row1_cantidad = cantidad_controller.text;
       row1_producto_nombre = database_nombre;
       row1_total = total_for_row_as_string;
+      row1_por_mayor = database_por_mayor;
       row1_precio_unitario = database_precio_unitario;
       table_rows[0] = DataRow(cells: [
         DataCell(Text(row1_cantidad, style: _table_text_style(),)),
         DataCell(Text(row1_producto_nombre, style: _table_text_style(),)),
         DataCell(Text(row1_precio_unitario, style: _table_text_style(),)),
+        DataCell(Text(row1_por_mayor, style: _table_text_style(),)),
         DataCell(Text(row1_total, style: _table_text_style(),)),
       ]);
 
@@ -284,6 +314,7 @@ void database_search(String codigo){
       DataCell(Text(cantidad_controller.text, style: _table_text_style(),)),
       DataCell(Text(database_nombre, style: _table_text_style(),)),
       DataCell(Text(database_precio_unitario, style: _table_text_style(),)),
+      DataCell(Text(database_por_mayor, style: _table_text_style(),)),
       DataCell(Text(total_for_row_as_string,style: _table_text_style(),)),
 
     ])
@@ -297,6 +328,7 @@ List <DataRow> table_rows = [DataRow(cells: [
   DataCell(Text(row1_cantidad)),
   DataCell(Text(row1_producto_nombre)),
   DataCell(Text(row1_precio_unitario)),
+  DataCell(Text(row1_por_mayor)),
   DataCell(Text(row1_total)),
 ])];
 
@@ -499,6 +531,11 @@ int database_loading = 0;
                   ),)),
                   DataColumn(label: Text("Precio Unitario", style: TextStyle(
                     color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold
+                  ),)),
+                  DataColumn(label: Text("Por Mayor", style: TextStyle(
+                   color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold
                   ),)),
