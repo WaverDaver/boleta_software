@@ -2,6 +2,7 @@
 
 import 'dart:typed_data';
 
+
 import 'package:boleta_software/textboxes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -24,9 +25,24 @@ class HomeScreen extends StatefulWidget {
 String person_selected = '';
 bool entrar_pressed = false;
 int entrar_pressed_count = 0;
+
+
+//all the colors
 Color blue = Colors.blue;
 Color red = Colors.red;
-Color buttons_color = Color.fromRGBO(79, 156, 249, 1);
+Color buttons_color = Color.fromRGBO(0, 123, 255, 1);
+Color text_color = Color.fromRGBO(51, 51, 51, 1);
+Color total_widget_color = Color.fromRGBO(100, 180, 100, 1);
+Color all_background_color = Color.fromRGBO(240, 240, 240, 1);
+Color table_header_text_color = Color.fromRGBO(255, 255, 255, 1);
+Color table_background_color = Color.fromRGBO(40, 80, 160, 1);
+Color table_text_color = Color.fromRGBO(30, 30, 30, 1);
+Color table_rows_background_color = Color.fromRGBO(255, 255, 255, 1);
+Color tab_background_color = Color.fromRGBO(50,100,200,1);
+Color tab_text_color = Color.fromRGBO(255, 255, 255, 1);
+Color entrar_button_color = Color.fromRGBO(40, 80, 160, 1);
+Color listo_button_color = Color.fromRGBO(40, 80, 160, 1);
+
 
 
 //first row text variables (or else the table breaks because it can't have no rows at the start)
@@ -300,7 +316,9 @@ void database_search(String codigo){
       row1_total = total_for_row_as_string;
       row1_por_mayor = database_por_mayor;
       row1_precio_unitario = database_precio_unitario;
-      table_rows[0] = DataRow(cells: [
+      table_rows[0] = DataRow(
+        color: WidgetStateProperty.all<Color>(table_rows_background_color),
+        cells: [
         DataCell(Text(row1_cantidad, style: _table_text_style(),)),
         DataCell(Text(row1_producto_nombre, style: _table_text_style(),)),
         DataCell(Text(row1_precio_unitario, style: _table_text_style(),)),
@@ -310,7 +328,9 @@ void database_search(String codigo){
 
     } else if (row1count >= 2){
 
-      table_rows.add(DataRow(cells: [
+      table_rows.add(DataRow(
+        color: WidgetStateProperty.all<Color>(table_rows_background_color),
+        cells: [
       DataCell(Text(cantidad_controller.text, style: _table_text_style(),)),
       DataCell(Text(database_nombre, style: _table_text_style(),)),
       DataCell(Text(database_precio_unitario, style: _table_text_style(),)),
@@ -345,7 +365,7 @@ int database_loading = 0;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Color.fromRGBO(4, 56, 115, 1),
+      backgroundColor: all_background_color,
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 0.0),
         child: Column(
@@ -388,7 +408,7 @@ int database_loading = 0;
                     });
                   }, 
                   style: OutlinedButton.styleFrom(
-                    backgroundColor: buttons_color,
+                    backgroundColor: tab_background_color,
                     shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.zero)
                   ),
@@ -396,14 +416,14 @@ int database_loading = 0;
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.normal,
-                    color: Colors.white
+                    color: tab_text_color
                   ),)),
                   Spacer(),
 
                   //menu to pick which worker
                       DropdownMenu(
                         textStyle: TextStyle(
-                          color: Colors.white
+                          color: Color.fromRGBO(240, 240, 240, 1),
                         ),
                         onSelected: (value){
                           setState(() {
@@ -434,7 +454,7 @@ int database_loading = 0;
                     controller: codigo_controller,
                     focusNode: _focusnode1,
                     textStyle: TextStyle(
-                      color: Colors.white
+                      color: Color.fromRGBO(30, 30, 30, 1),
                     ),),
                 
                 
@@ -448,7 +468,7 @@ int database_loading = 0;
                       controller: cantidad_controller,
                       focusNode: _focusnode2,
                       textStyle: TextStyle(
-                        color: Colors.white
+                        color: Color.fromRGBO(30, 30, 30, 1)
                       ),),
                       
                   ),
@@ -461,35 +481,39 @@ int database_loading = 0;
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
 
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6)
+                      ),
+                      backgroundColor: entrar_button_color
                     ),
-                    backgroundColor: buttons_color
-                  ),
-                  focusNode: _focusnodeButton,
-                  onPressed: (){
-                    database_search(codigo_controller.text);
-                    producto_numero = codigo_controller.text;
-                    handling_total();
-                    setState(() {
-                      entrar_pressed = true;
-                      entrar_pressed_count = entrar_pressed_count + 1;
-                      row1count = row1count + 1;
-                      adding_table();
-                      cantidad_controller.clear();
-                      codigo_controller.clear();
-                    });
-                    handling_entrar();
-                  }, 
-                child: Text("Entrar",
-                style: TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.normal,
-          color: Colors.white
-        ),
-        ),)
+                    focusNode: _focusnodeButton,
+                    onPressed: (){
+                      database_search(codigo_controller.text);
+                      producto_numero = codigo_controller.text;
+                      handling_total();
+                      setState(() {
+                        entrar_pressed = true;
+                        entrar_pressed_count = entrar_pressed_count + 1;
+                        row1count = row1count + 1;
+                        adding_table();
+                        cantidad_controller.clear();
+                        codigo_controller.clear();
+                      });
+                      handling_entrar();
+                    }, 
+                  child: Text("Entrar",
+                  style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.normal,
+                            color: Color.fromRGBO(255,255,255,1),
+                          ),
+                          ),),
+                )
               ],
             ),
 
@@ -497,7 +521,7 @@ int database_loading = 0;
 
             Container(
               decoration: BoxDecoration(
-                color: buttons_color,
+                color: table_background_color,
                 borderRadius: BorderRadius.circular(16.0)
               ),
               child: DataTable(
@@ -509,10 +533,10 @@ int database_loading = 0;
                   right: BorderSide.none,
                   left: BorderSide.none,
                   verticalInside: BorderSide(
-                    color: Color.fromRGBO(0, 166, 251,1)
+                    color: Color.fromRGBO(200, 200, 200, 1)
                   ),
                   horizontalInside: BorderSide(
-                    color: Color.fromRGBO(0, 166, 251, 1)
+                    color: Color.fromRGBO(200, 200, 200, 1)
                   )
                 ),
 
@@ -520,27 +544,27 @@ int database_loading = 0;
                 columns: [
                   DataColumn(label: Text("Cantidad", 
                   style: TextStyle(
-                    color: Colors.white,
+                    color: table_header_text_color,
                     fontSize: 20,
                     fontWeight: FontWeight.bold
                   ),)),
                   DataColumn(label: Text("Producto Nombre", style: TextStyle(
-                    color: Colors.white,
+                    color: table_header_text_color,
                     fontSize: 20,
                     fontWeight: FontWeight.bold
                   ),)),
                   DataColumn(label: Text("Precio Unitario", style: TextStyle(
-                    color: Colors.white,
+                    color: table_header_text_color,
                     fontSize: 20,
                     fontWeight: FontWeight.bold
                   ),)),
                   DataColumn(label: Text("Por Mayor", style: TextStyle(
-                   color: Colors.white,
+                   color: table_header_text_color,
                     fontSize: 20,
                     fontWeight: FontWeight.bold
                   ),)),
                   DataColumn(label: Text("Total", style: TextStyle(
-                    color: Colors.white,
+                    color: table_header_text_color,
                     fontSize: 20,
                     fontWeight: FontWeight.bold
                   ),))
@@ -561,12 +585,13 @@ int database_loading = 0;
                   
                   width: 300,
                   height: 75,
-                  color: Colors.blueAccent,
+                  //total widget color
+                  color: total_widget_color,
                   child: Center(
                     child: RichText(
                       text: TextSpan(
                         text: "Total: ",
-                        style: TextStyle(fontSize: 35, fontStyle: FontStyle.italic),
+                        style: TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
                         children: <TextSpan>[
                           TextSpan(
                             text: overall_price_as_string,
@@ -574,7 +599,7 @@ int database_loading = 0;
                           )
                         ]
                       ),
-          
+
                       ),
                     ),
                   ),
@@ -592,7 +617,7 @@ int database_loading = 0;
                   
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      backgroundColor: buttons_color,
+                      backgroundColor: listo_button_color,
                       shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6)
                     ),
@@ -609,7 +634,7 @@ int database_loading = 0;
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6)
                     ),
-                    backgroundColor: Color.fromRGBO(219, 58, 52, 1)
+                    backgroundColor: Color.fromRGBO(220, 80, 80, 1)
                   ), 
                   onPressed: handling_borrar, 
                   child: Text("Borrar",
@@ -637,7 +662,7 @@ int database_loading = 0;
         style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.normal,
-          color: Colors.white
+          color: tab_text_color
 
         ),
         ),
@@ -654,7 +679,7 @@ int database_loading = 0;
 
   TextStyle _table_text_style(){
     return TextStyle(
-      color: Colors.white,
+      color: table_text_color,
       fontSize: 14,
       fontWeight: FontWeight.normal
     );
@@ -662,7 +687,7 @@ int database_loading = 0;
 
   ButtonStyle _buttonstyle(){
     return OutlinedButton.styleFrom(
-      backgroundColor: buttons_color,
+      backgroundColor: tab_background_color,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.zero
       )

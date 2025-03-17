@@ -49,14 +49,14 @@ final _focusnode2 = FocusNode();
       maxLength: widget.maxlength,
       maxLines: widget.maxlines,
       style: widget.textStyle,
-      cursorColor: Colors.white,
+      cursorColor: Color.fromRGBO(30, 30, 30, 1),
       decoration: InputDecoration(
         hintText: widget.hintText,
 
         //controls the color of the border when it is not selected
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
-            color: const Color.fromARGB(255, 255, 255, 255),
+            color: Colors.grey,
           )
         ),
 
@@ -70,7 +70,8 @@ final _focusnode2 = FocusNode();
           fontStyle: FontStyle.italic,
           color: const Color.fromARGB(255, 156, 156, 156),
 
-        )
+        ),
+        counterText: ''
       ),
 
     );
